@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eridian Biology — A Xenobiology Field Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0a0c;--bg2:#111115;--bg3:#1a1a20;
+--copper:#c4845c;--copper-light:#e8a87c;--copper-dim:#7a5038;
+--teal:#4ecdc4;--teal-dim:#2a7a74;
+--hcs:#e85d3a;--hcs-dim:#8b3622;
+--amber:#f0c040;
+--text:#e8e4de;--text-dim:#8a8680;--text-faint:#555550;
+--serif:'Cormorant Garamond',Georgia,serif;
+--sans:'DM Sans',system-ui,sans-serif;
+--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{font-family:var(--sans);color:var(--text);background:var(--bg);line-height:1.7;overflow-x:hidden;font-weight:300}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--copper-dim);border-radius:3px}
+
+/* Section base */
+section{padding:80px 20px;max-width:800px;margin:0 auto;position:relative}
+@media(min-width:768px){section{padding:120px 40px}}
+
+/* Typography */
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(2.5rem,8vw,5rem);color:var(--copper-light);line-height:1.1;letter-spacing:-.02em}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.8rem,5vw,2.8rem);color:var(--copper);margin-bottom:1rem;line-height:1.2}
+h3{font-family:var(--serif);font-weight:600;font-size:1.3rem;color:var(--copper-light);margin:2rem 0 .8rem}
+p{margin-bottom:1.2rem;font-size:.95rem;color:var(--text)}
+.dim{color:var(--text-dim)}
+.label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:var(--text-faint)}
+.accent{color:var(--teal)}
+.hot{color:var(--hcs)}
+.highlight{color:var(--amber)}
+
+/* Fade-in on scroll */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* Hero */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,rgba(196,132,92,.08) 0%,transparent 60%)}
+.hero-subtitle{font-family:var(--mono);font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:var(--text-faint);margin-bottom:1.5rem}
+.hero-tagline{font-family:var(--serif);font-style:italic;font-size:clamp(1rem,3vw,1.3rem);color:var(--text-dim);max-width:500px;margin-top:2rem}
+.scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-faint);font-size:.7rem;letter-spacing:.2em;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+.scroll-hint svg{width:20px;height:20px;stroke:var(--text-faint)}
+
+/* Divider */
+.divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--copper-dim),transparent);margin:0 auto 2rem}
+
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:2rem 0}
+.stat-card{background:var(--bg2);border:1px solid rgba(196,132,92,.12);border-radius:12px;padding:20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--copper-dim),var(--copper),var(--copper-dim))}
+.stat-value{font-family:var(--mono);font-size:1.5rem;font-weight:500;color:var(--copper-light)}
+.stat-label{font-size:.75rem;color:var(--text-dim);margin-top:4px}
+.stat-compare{font-family:var(--mono);font-size:.65rem;color:var(--text-faint);margin-top:6px}
+
+/* SVG containers */
+.diagram-container{background:var(--bg2);border:1px solid rgba(196,132,92,.1);border-radius:16px;padding:20px;margin:2rem 0;overflow:hidden}
+.diagram-container svg{width:100%;height:auto;display:block}
+
+/* Interactive anatomy */
+.anatomy-wrap{position:relative;touch-action:manipulation}
+.hotspot{cursor:pointer;transition:all .3s}
+.hotspot:hover,.hotspot.active{filter:drop-shadow(0 0 8px rgba(78,205,196,.5))}
+.info-popup{position:fixed;bottom:0;left:0;right:0;background:var(--bg3);border-top:1px solid var(--copper-dim);padding:24px 20px 40px;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1);z-index:100;max-height:50vh;overflow-y:auto;border-radius:16px 16px 0 0}
+.info-popup.open{transform:translateY(0)}
+.info-popup h4{font-family:var(--serif);font-size:1.2rem;color:var(--copper-light);margin-bottom:.5rem}
+.info-popup p{font-size:.85rem;color:var(--text-dim);margin-bottom:.5rem}
+.popup-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text-faint);font-size:1.2rem;cursor:pointer;padding:8px}
+.popup-handle{width:40px;height:4px;background:var(--text-faint);border-radius:2px;margin:0 auto 16px;opacity:.4}
+
+/* Comparison bars */
+.compare-bar-wrap{margin:1.5rem 0}
+.compare-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.compare-label{font-size:.75rem;color:var(--text-dim);width:80px;flex-shrink:0;text-align:right}
+.compare-track{flex:1;height:24px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative}
+.compare-fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--mono);font-size:.65rem;color:var(--bg);font-weight:500;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.compare-fill.earth{background:linear-gradient(90deg,#3a6ea5,#5b9bd5)}
+.compare-fill.erid{background:linear-gradient(90deg,var(--copper-dim),var(--copper))}
+
+/* Temperature gauge */
+.temp-gauge{display:flex;flex-direction:column;align-items:center;margin:2rem 0}
+.gauge-track{width:40px;height:300px;background:var(--bg);border-radius:20px;position:relative;overflow:hidden;border:1px solid rgba(196,132,92,.15)}
+.gauge-zone{position:absolute;left:0;right:0}
+.gauge-label{position:absolute;right:-90px;font-family:var(--mono);font-size:.6rem;white-space:nowrap}
+.gauge-marker{position:absolute;left:-8px;right:-8px;height:2px;z-index:2}
+
+/* Cards */
+.info-card{background:var(--bg2);border-left:3px solid var(--copper-dim);padding:20px;margin:1.5rem 0;border-radius:0 12px 12px 0}
+.info-card.teal{border-left-color:var(--teal)}
+.info-card.hot{border-left-color:var(--hcs)}
+.info-card.amber{border-left-color:var(--amber)}
+
+/* Timeline */
+.timeline{position:relative;padding-left:24px;margin:2rem 0}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:var(--copper-dim)}
+.timeline-item{position:relative;margin-bottom:24px;padding-left:20px}
+.timeline-item::before{content:'';position:absolute;left:-20px;top:6px;width:10px;height:10px;border-radius:50%;border:2px solid var(--copper);background:var(--bg)}
+
+/* Tabs */
+.tab-nav{display:flex;gap:4px;overflow-x:auto;margin-bottom:24px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.tab-btn{font-family:var(--mono);font-size:.7rem;padding:8px 16px;background:var(--bg2);border:1px solid transparent;border-radius:8px;color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:all .3s}
+.tab-btn.active{border-color:var(--copper);color:var(--copper-light);background:rgba(196,132,92,.08)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Interactive muscle demo */
+.muscle-demo{background:var(--bg2);border-radius:16px;padding:24px;margin:2rem 0;text-align:center}
+.muscle-btn{font-family:var(--mono);font-size:.75rem;padding:10px 24px;background:linear-gradient(135deg,var(--hcs-dim),var(--hcs));border:none;border-radius:8px;color:white;cursor:pointer;transition:all .3s;margin-top:12px}
+.muscle-btn:active{transform:scale(.96)}
+
+/* Nav dots */
+.nav-dots{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:8px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:var(--text-faint);border:none;cursor:pointer;transition:all .3s;padding:0}
+.nav-dot.active{background:var(--copper);transform:scale(1.4)}
+@media(max-width:768px){.nav-dots{right:6px}.nav-dot{width:6px;height:6px}}
+
+/* Footer */
+footer{text-align:center;padding:60px 20px;color:var(--text-faint);font-size:.75rem;border-top:1px solid rgba(196,132,92,.08)}
+
+/* Animated lines */
+.pulse-line{animation:pulse-opacity 3s ease-in-out infinite}
+@keyframes pulse-opacity{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* Breathing animation */
+.breathe{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.08)}}
+
+/* Number counter */
+.counter{font-family:var(--mono);font-size:2rem;color:var(--copper-light)}
+
+/* Section numbering */
+.section-num{font-family:var(--mono);font-size:.6rem;color:var(--text-faint);letter-spacing:.3em;margin-bottom:.5rem;display:block}
+
+/* Worker cell animation */
+.cell-container{position:relative;height:200px;background:var(--bg);border-radius:12px;overflow:hidden;margin:1.5rem 0}
+.worker-cell{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--teal);opacity:.6;animation:float-cell linear infinite}
+@keyframes float-cell{0%{transform:translate(0,0)}25%{transform:translate(30px,-20px)}50%{transform:translate(60px,10px)}75%{transform:translate(20px,30px)}100%{transform:translate(0,0)}}
+
+/* Size comparison */
+.size-compare{display:flex;align-items:flex-end;justify-content:center;gap:40px;padding:40px 20px;background:var(--bg2);border-radius:16px;margin:2rem 0}
+.size-figure{display:flex;flex-direction:column;align-items:center;gap:8px}
+.size-figure .label{text-align:center}
+
+/* Glow effect */
+.glow-teal{filter:drop-shadow(0 0 6px rgba(78,205,196,.3))}
+.glow-hcs{filter:drop-shadow(0 0 6px rgba(232,93,58,.3))}
+
+/* Death clock */
+.death-clock{background:linear-gradient(135deg,#1a0a0a,#0a0a0c);border:1px solid rgba(232,93,58,.2);border-radius:16px;padding:24px;margin:2rem 0;text-align:center}
+.clock-display{font-family:var(--mono);font-size:3rem;color:var(--hcs);margin:16px 0;letter-spacing:.1em}
+.clock-bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin:12px 0}
+.clock-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--amber),var(--hcs));border-radius:3px;transition:width .1s}
+.clock-btn{font-family:var(--mono);font-size:.7rem;padding:8px 20px;background:rgba(232,93,58,.15);border:1px solid var(--hcs-dim);border-radius:6px;color:var(--hcs);cursor:pointer;margin-top:8px}
+
+/* Culture grid */
+.culture-grid{display:grid;grid-template-columns:1fr;gap:16px;margin:2rem 0}
+@media(min-width:500px){.culture-grid{grid-template-columns:1fr 1fr}}
+.culture-item{background:var(--bg2);border-radius:12px;padding:20px;border:1px solid rgba(196,132,92,.08)}
+.culture-icon{font-size:1.5rem;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<!-- Nav dots -->
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-subtitle">Xenobiology Field Guide</div>
+  <h1>Eridian<br>Biology</h1>
+  <div class="hero-tagline">"The body is almost like a ship and its crew are the worker cells."</div>
+  
+  <!-- Silhouette SVG -->
+  <svg viewBox="0 0 400 350" style="width:min(300px,70vw);margin-top:3rem;opacity:.15" xmlns="http://www.w3.org/2000/svg">
+    <!-- Stylized Eridian silhouette - pentagonal body with 5 legs -->
+    <defs>
+      <radialGradient id="bodyGlow" cx="50%" cy="40%" r="50%">
+        <stop offset="0%" stop-color="var(--copper)" stop-opacity=".4"/>
+        <stop offset="100%" stop-color="var(--copper)" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="200" cy="120" rx="90" ry="55" fill="url(#bodyGlow)"/>
+    <!-- Carapace -->
+    <path d="M200 65 L260 95 L250 155 L200 175 L150 155 L140 95 Z" fill="none" stroke="var(--copper)" stroke-width="1.5" opacity=".6"/>
+    <!-- Cap segment -->
+    <path d="M175 75 L225 75 L230 65 L170 65 Z" fill="none" stroke="var(--copper)" stroke-width="1" opacity=".4"/>
+    <!-- 5 Legs -->
+    <line x1="145" y1="105" x2="60" y2="260" stroke="var(--copper)" stroke-width="1.5" opacity=".5"/>
+    <line x1="255" y1="105" x2="340" y2="260" stroke="var(--copper)" stroke-width="1.5" opacity=".5"/>
+    <line x1="140" y1="150" x2="40" y2="290" stroke="var(--copper)" stroke-width="1.5" opacity=".5"/>
+    <line x1="260" y1="150" x2="360" y2="290" stroke="var(--copper)" stroke-width="1.5" opacity=".5"/>
+    <line x1="200" y1="175" x2="200" y2="310" stroke="var(--copper)" stroke-width="1.5" opacity=".5"/>
+    <!-- Claws (trifurcated) -->
+    <g opacity=".4" stroke="var(--copper)" stroke-width="1" fill="none">
+      <path d="M60 260 L50 275 M60 260 L60 278 M60 260 L70 275"/>
+      <path d="M340 260 L330 275 M340 260 L340 278 M340 260 L350 275"/>
+      <path d="M40 290 L28 305 M40 290 L38 308 M40 290 L50 305"/>
+      <path d="M360 290 L348 305 M360 290 L358 308 M360 290 L370 305"/>
+      <path d="M200 310 L190 325 M200 310 L200 328 M200 310 L210 325"/>
+    </g>
+  </svg>
+  
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- HOMEWORLD -->
+<section id="sec-homeworld" class="reveal">
+  <span class="section-num">01</span>
+  <h2>Homeworld</h2>
+  <div class="divider"></div>
+  <p>The Eridians evolved on <strong class="accent">40 Eridani A b</strong> — a real exoplanet orbiting the primary star of a trinary system. It's a dense, rocky world baked in ammonia atmosphere at crushing pressures. Nicknamed <strong>"Erid"</strong> by Ryland Grace.</p>
+  
+  <div class="stat-grid">
+    <div class="stat-card reveal">
+      <div class="label">Surface Gravity</div>
+      <div class="stat-value">2.09g</div>
+      <div class="stat-compare">Earth: 1.0g</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="label">Surface Temp</div>
+      <div class="stat-value">210°C</div>
+      <div class="stat-compare">Earth avg: 15°C</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="label">Pressure</div>
+      <div class="stat-value">29 atm</div>
+      <div class="stat-compare">Earth: 1 atm</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="label">Day Length</div>
+      <div class="stat-value">5.1 hr</div>
+      <div class="stat-compare">Earth: 24 hr</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="label">Atmosphere</div>
+      <div class="stat-value">NH₃</div>
+      <div class="stat-compare">Earth: N₂/O₂</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="label">Radius</div>
+      <div class="stat-value">12835km</div>
+      <div class="stat-compare">Earth: 6371km</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="label">Mass</div>
+      <div class="stat-value">8.47 Mₑ</div>
+      <div class="stat-compare">~8.5× Earth mass</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="label">Year</div>
+      <div class="stat-value">42.2 d</div>
+      <div class="stat-compare">Earth: 365 days</div>
+    </div>
+  </div>
+  
+  <div class="info-card">
+    <p style="margin:0;font-size:.85rem">The thick atmosphere and airborne microbial life block virtually all sunlight from reaching the surface. Life on the ground evolved <strong>without eyes</strong> — just like Earth's deep oceans.</p>
+  </div>
+</section>
+
+<!-- EXTERNAL ANATOMY -->
+<section id="sec-anatomy" class="reveal">
+  <span class="section-num">02</span>
+  <h2>External Anatomy</h2>
+  <div class="divider"></div>
+  <p>Tap any highlighted area to learn more.</p>
+  
+  <div class="diagram-container anatomy-wrap">
+    <svg id="anatomySvg" viewBox="0 0 500 520" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="carapaceGrad" cx="50%" cy="40%">
+          <stop offset="0%" stop-color="#a07050"/>
+          <stop offset="60%" stop-color="#7a5038"/>
+          <stop offset="100%" stop-color="#5a3828"/>
+        </radialGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      
+      <!-- Body background -->
+      <rect width="500" height="520" fill="var(--bg2)" rx="12"/>
+      
+      <!-- Grid lines -->
+      <g opacity=".06" stroke="var(--copper)">
+        <line x1="0" y1="130" x2="500" y2="130" stroke-dasharray="4,8"/>
+        <line x1="0" y1="260" x2="500" y2="260" stroke-dasharray="4,8"/>
+        <line x1="0" y1="390" x2="500" y2="390" stroke-dasharray="4,8"/>
+        <line x1="250" y1="0" x2="250" y2="520" stroke-dasharray="4,8"/>
+      </g>
+      
+      <!-- LEG 1 - back left -->
+      <g class="hotspot" data-info="limbs">
+        <line x1="175" y1="200" x2="70" y2="400" stroke="#8a6045" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="120" cy="300" r="6" fill="#6a4535" stroke="#8a6045" stroke-width="1"/>
+        <!-- Claw -->
+        <path d="M70 400 L55 425 M70 400 L70 428 M70 400 L85 425" stroke="#8a6045" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      
+      <!-- LEG 2 - back right -->
+      <g class="hotspot" data-info="limbs">
+        <line x1="325" y1="200" x2="430" y2="400" stroke="#8a6045" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="380" cy="300" r="6" fill="#6a4535" stroke="#8a6045" stroke-width="1"/>
+        <path d="M430 400 L415 425 M430 400 L430 428 M430 400 L445 425" stroke="#8a6045" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      
+      <!-- LEG 3 - front left -->
+      <g class="hotspot" data-info="limbs">
+        <line x1="185" y1="220" x2="95" y2="430" stroke="#8a6045" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="140" cy="325" r="6" fill="#6a4535" stroke="#8a6045" stroke-width="1"/>
+        <path d="M95 430 L80 455 M95 430 L95 458 M95 430 L110 455" stroke="#8a6045" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      
+      <!-- LEG 4 - front right -->
+      <g class="hotspot" data-info="limbs">
+        <line x1="315" y1="220" x2="405" y2="430" stroke="#8a6045" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="360" cy="325" r="6" fill="#6a4535" stroke="#8a6045" stroke-width="1"/>
+        <path d="M405 430 L390 455 M405 430 L405 458 M405 430 L420 455" stroke="#8a6045" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      
+      <!-- LEG 5 - center front -->
+      <g class="hotspot" data-info="limbs">
+        <line x1="250" y1="250" x2="250" y2="470" stroke="#8a6045" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="250" cy="360" r="6" fill="#6a4535" stroke="#8a6045" stroke-width="1"/>
+        <path d="M250 470 L235 495 M250 470 L250 498 M250 470 L265 495" stroke="#8a6045" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      
+      <!-- THORAX - pentagonal -->
+      <g class="hotspot" data-info="thorax">
+        <path d="M250 100 L340 155 L320 240 L180 240 L160 155 Z" fill="url(#carapaceGrad)" stroke="#a07050" stroke-width="2"/>
+        <!-- Carapace texture lines -->
+        <path d="M200 130 Q250 140 300 130" fill="none" stroke="#6a4535" stroke-width="1" opacity=".5"/>
+        <path d="M190 160 Q250 175 310 160" fill="none" stroke="#6a4535" stroke-width="1" opacity=".5"/>
+        <path d="M185 190 Q250 210 315 190" fill="none" stroke="#6a4535" stroke-width="1" opacity=".4"/>
+      </g>
+      
+      <!-- CAP SEGMENT with vents -->
+      <g class="hotspot" data-info="vents">
+        <path d="M210 100 L250 85 L290 100" fill="#6a4535" stroke="#8a6045" stroke-width="1.5"/>
+        <!-- Vent slits -->
+        <line x1="225" y1="95" x2="225" y2="88" stroke="var(--teal)" stroke-width="2" opacity=".6"/>
+        <line x1="250" y1="92" x2="250" y2="84" stroke="var(--teal)" stroke-width="2" opacity=".6"/>
+        <line x1="275" y1="95" x2="275" y2="88" stroke="var(--teal)" stroke-width="2" opacity=".6"/>
+        <!-- Heat waves -->
+        <g class="breathe" opacity=".4">
+          <path d="M235 78 Q240 70 245 78" fill="none" stroke="var(--hcs)" stroke-width="1"/>
+          <path d="M250 75 Q255 66 260 75" fill="none" stroke="var(--hcs)" stroke-width="1"/>
+        </g>
+      </g>
+      
+      <!-- AURICLES (hearing dots) -->
+      <g class="hotspot" data-info="hearing">
+        <g opacity=".7">
+          <circle cx="165" cy="140" r="2" fill="var(--teal)"/><circle cx="172" cy="130" r="1.5" fill="var(--teal)"/>
+          <circle cx="160" cy="155" r="1.5" fill="var(--teal)"/><circle cx="155" cy="170" r="2" fill="var(--teal)"/>
+          <circle cx="340" cy="155" r="2" fill="var(--teal)"/><circle cx="335" cy="170" r="1.5" fill="var(--teal)"/>
+          <circle cx="338" cy="140" r="1.5" fill="var(--teal)"/><circle cx="330" cy="130" r="2" fill="var(--teal)"/>
+          <circle cx="185" cy="240" r="1.5" fill="var(--teal)"/><circle cx="315" cy="240" r="1.5" fill="var(--teal)"/>
+        </g>
+        <!-- Sound wave indicators -->
+        <g opacity=".2" class="pulse-line">
+          <circle cx="155" cy="155" r="20" fill="none" stroke="var(--teal)" stroke-width=".5"/>
+          <circle cx="155" cy="155" r="35" fill="none" stroke="var(--teal)" stroke-width=".3"/>
+        </g>
+      </g>
+      
+      <!-- Ventral mouth indicator -->
+      <g class="hotspot" data-info="mouth">
+        <ellipse cx="250" cy="245" rx="20" ry="6" fill="none" stroke="var(--copper-dim)" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <text x="250" y="265" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">VENTRAL MOUTH</text>
+      </g>
+      
+      <!-- Labels -->
+      <g font-family="var(--mono)" font-size="8" fill="var(--text-faint)">
+        <text x="250" y="30" text-anchor="middle" letter-spacing=".15em">DORSAL VIEW</text>
+        <line x1="345" y1="120" x2="400" y2="90" stroke="var(--text-faint)" stroke-width=".5"/>
+        <text x="403" y="93" font-size="7">CAP SEGMENT</text>
+        <line x1="350" y1="195" x2="420" y2="195" stroke="var(--text-faint)" stroke-width=".5"/>
+        <text x="423" y="198" font-size="7">CARAPACE</text>
+        <line x1="383" y1="300" x2="430" y2="280" stroke="var(--text-faint)" stroke-width=".5"/>
+        <text x="433" y="283" font-size="7">HINGE JOINT</text>
+        <line x1="435" y1="415" x2="460" y2="400" stroke="var(--text-faint)" stroke-width=".5"/>
+        <text x="430" y="420" font-size="7">TRIFURCATED</text>
+        <text x="430" y="430" font-size="7">CLAW</text>
+      </g>
+      
+      <!-- Scale bar -->
+      <g transform="translate(30,490)">
+        <line x1="0" y1="0" x2="100" y2="0" stroke="var(--text-faint)" stroke-width="1"/>
+        <line x1="0" y1="-4" x2="0" y2="4" stroke="var(--text-faint)" stroke-width="1"/>
+        <line x1="100" y1="-4" x2="100" y2="4" stroke="var(--text-faint)" stroke-width="1"/>
+        <text x="50" y="14" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">~30 cm</text>
+      </g>
+    </svg>
+  </div>
+  
+  <div class="info-card">
+    <h3 style="margin-top:0">Pentadextrous</h3>
+    <p style="margin:0;font-size:.85rem">Any limb can be a hand or a foot. Standing on 3 legs frees 2 for manipulation. On all 5, they're incredibly sure-footed. They have no concept of "facing" a direction — they're omnidirectional.</p>
+  </div>
+</section>
+
+<!-- SENSES -->
+<section id="sec-senses" class="reveal">
+  <span class="section-num">03</span>
+  <h2>Senses</h2>
+  <div class="divider"></div>
+  
+  <h3>No Sight</h3>
+  <p>Eridians have no eyes and no ability to detect electromagnetic radiation at all. The thick atmosphere and aerial ecosystem blocks all sunlight from reaching the surface — eyes never evolved.</p>
+  
+  <h3>Hearing — Their Primary Sense</h3>
+  <p>Hundreds of thousands of <span class="accent">piezoelectric auricles</span> cover the carapace, each tuned to a specific frequency. They generate tiny flashes of light that feed directly into the fiber-optic nervous system. From ambient noise alone, an Eridian builds a <strong>complete 3D mental image</strong> of its surroundings — like echolocation, but passive and omnidirectional.</p>
+  
+  <div class="diagram-container">
+    <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+      <rect width="500" height="220" fill="var(--bg2)" rx="12"/>
+      <text x="250" y="20" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--text-faint)" letter-spacing=".15em">PIEZOELECTRIC AURICLE SYSTEM</text>
+      
+      <!-- Carapace surface cross-section -->
+      <path d="M100 130 Q250 80 400 130" fill="none" stroke="var(--copper-dim)" stroke-width="20" opacity=".3"/>
+      <path d="M100 130 Q250 80 400 130" fill="none" stroke="var(--copper)" stroke-width="2"/>
+      
+      <!-- Auricles on surface -->
+      <g id="auricleGroup">
+        <g transform="translate(160,105)">
+          <rect x="-3" y="-12" width="6" height="12" fill="var(--teal)" rx="1" opacity=".8"/>
+          <circle cx="0" cy="-12" r="3" fill="var(--teal)" opacity=".6"/>
+        </g>
+        <g transform="translate(200,93)">
+          <rect x="-3" y="-12" width="6" height="12" fill="var(--teal)" rx="1" opacity=".7"/>
+          <circle cx="0" cy="-12" r="3" fill="var(--teal)" opacity=".5"/>
+        </g>
+        <g transform="translate(250,87)">
+          <rect x="-3" y="-14" width="6" height="14" fill="var(--teal)" rx="1" opacity=".9"/>
+          <circle cx="0" cy="-14" r="3" fill="var(--teal)" opacity=".7"/>
+        </g>
+        <g transform="translate(300,93)">
+          <rect x="-3" y="-12" width="6" height="12" fill="var(--teal)" rx="1" opacity=".7"/>
+          <circle cx="0" cy="-12" r="3" fill="var(--teal)" opacity=".5"/>
+        </g>
+        <g transform="translate(340,105)">
+          <rect x="-3" y="-10" width="6" height="10" fill="var(--teal)" rx="1" opacity=".8"/>
+          <circle cx="0" cy="-10" r="3" fill="var(--teal)" opacity=".6"/>
+        </g>
+      </g>
+      
+      <!-- Sound waves coming in -->
+      <g opacity=".3" class="pulse-line">
+        <path d="M50 60 Q80 55 110 60" fill="none" stroke="var(--teal)" stroke-width="1"/>
+        <path d="M40 45 Q80 38 120 45" fill="none" stroke="var(--teal)" stroke-width=".7"/>
+        <path d="M30 30 Q80 20 130 30" fill="none" stroke="var(--teal)" stroke-width=".5"/>
+      </g>
+      
+      <!-- Fiber optic nerve going down -->
+      <g>
+        <path d="M250 130 L250 195" stroke="var(--amber)" stroke-width="2" opacity=".6" stroke-dasharray="4,4"/>
+        <text x="270" y="170" font-family="var(--mono)" font-size="7" fill="var(--amber)" opacity=".6">FIBER-OPTIC NERVE</text>
+      </g>
+      
+      <!-- Labels -->
+      <text x="380" y="75" font-family="var(--mono)" font-size="7" fill="var(--teal)" opacity=".7">SOUND WAVES</text>
+      <line x1="365" y1="78" x2="340" y2="90" stroke="var(--teal)" stroke-width=".5" opacity=".4"/>
+      <text x="250" y="210" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">→ TO CRYSTALLINE BRAIN</text>
+    </svg>
+  </div>
+  
+  <p>In silence, they tap the ground to generate their own sonar. Sound travels at <span class="accent" style="font-family:var(--mono)">555 m/s</span> through the ammonia atmosphere — faster than on Earth.</p>
+  
+  <h3>Magnetoreception</h3>
+  <p>Erid's magnetic field is 25× stronger than Earth's. Every Eridian has an innate compass — they always know which way is north. In space, their ships maintain a weak field for comfort, like a human wanting a blanket while sleeping.</p>
+</section>
+
+<!-- COMMUNICATION -->
+<section id="sec-communication" class="reveal">
+  <span class="section-num">04</span>
+  <h2>Communication</h2>
+  <div class="divider"></div>
+  
+  <p>Eridians speak in <strong class="accent">musical chords</strong>. Five internal gas bladder systems each produce a controlled tone by pushing air through a fine aperture. Combined, they can produce an enormous variety of "syllables" — chords of five simultaneous notes.</p>
+  
+  <div class="diagram-container">
+    <svg viewBox="0 0 500 250" xmlns="http://www.w3.org/2000/svg">
+      <rect width="500" height="250" fill="var(--bg2)" rx="12"/>
+      <text x="250" y="20" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--text-faint)" letter-spacing=".15em">GAS BLADDER VOCAL SYSTEM (×5)</text>
+      
+      <!-- Single bladder pair diagram -->
+      <g transform="translate(100,40)">
+        <!-- Bladder A -->
+        <ellipse cx="60" cy="80" rx="50" ry="35" fill="rgba(78,205,196,.08)" stroke="var(--teal)" stroke-width="1.5"/>
+        <text x="60" y="84" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--teal)" opacity=".7">BLADDER A</text>
+        
+        <!-- Aperture -->
+        <rect x="115" y="68" width="70" height="24" rx="4" fill="rgba(240,192,64,.05)" stroke="var(--amber)" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="150" y="84" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--amber)">APERTURE</text>
+        
+        <!-- Bladder B -->
+        <ellipse cx="240" cy="80" rx="50" ry="35" fill="rgba(78,205,196,.08)" stroke="var(--teal)" stroke-width="1.5"/>
+        <text x="240" y="84" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--teal)" opacity=".7">BLADDER B</text>
+        
+        <!-- Air flow arrows -->
+        <g class="pulse-line">
+          <path d="M110 70 L120 70" stroke="var(--amber)" stroke-width="2" marker-end="url(#arrowAmber)"/>
+          <path d="M180 90 L190 90" stroke="var(--amber)" stroke-width="2" marker-end="url(#arrowAmber)"/>
+        </g>
+        
+        <!-- Sound wave output -->
+        <g transform="translate(240,130)" opacity=".5">
+          <path d="M0 0 Q10 -8 20 0 Q30 8 40 0" fill="none" stroke="var(--amber)" stroke-width="1.5"/>
+          <path d="M5 15 Q15 7 25 15 Q35 23 45 15" fill="none" stroke="var(--amber)" stroke-width="1" opacity=".6"/>
+        </g>
+      </g>
+      
+      <!-- Chord visualization -->
+      <g transform="translate(50,190)">
+        <text x="0" y="0" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">SIMULTANEOUS OUTPUT:</text>
+        <!-- Five frequency lines -->
+        <g transform="translate(0,15)">
+          <line x1="0" y1="0" x2="400" y2="0" stroke="var(--bg)" stroke-width="1"/>
+          <path d="M0 0 Q10 -8 20 0 Q30 8 40 0 Q50 -8 60 0 Q70 8 80 0 Q90 -8 100 0 Q110 8 120 0 Q130 -8 140 0 Q150 8 160 0 Q170 -8 180 0 Q190 8 200 0 Q210 -8 220 0 Q230 8 240 0 Q250 -8 260 0 Q270 8 280 0 Q290 -8 300 0 Q310 8 320 0 Q330 -8 340 0 Q350 8 360 0 Q370 -8 380 0 Q390 8 400 0" fill="none" stroke="var(--teal)" stroke-width="1" opacity=".8"/>
+          <path d="M0 0 Q15 -5 30 0 Q45 5 60 0 Q75 -5 90 0 Q105 5 120 0 Q135 -5 150 0 Q165 5 180 0 Q195 -5 210 0 Q225 5 240 0 Q255 -5 270 0 Q285 5 300 0 Q315 -5 330 0 Q345 5 360 0 Q375 -5 390 0" fill="none" stroke="var(--copper)" stroke-width="1" opacity=".6"/>
+          <path d="M0 0 Q20 -12 40 0 Q60 12 80 0 Q100 -12 120 0 Q140 12 160 0 Q180 -12 200 0 Q220 12 240 0 Q260 -12 280 0 Q300 12 320 0 Q340 -12 360 0 Q380 12 400 0" fill="none" stroke="var(--hcs)" stroke-width="1" opacity=".5"/>
+          <path d="M0 0 Q25 -6 50 0 Q75 6 100 0 Q125 -6 150 0 Q175 6 200 0 Q225 -6 250 0 Q275 6 300 0 Q325 -6 350 0 Q375 6 400 0" fill="none" stroke="var(--amber)" stroke-width="1" opacity=".5"/>
+          <path d="M0 0 Q8 -4 16 0 Q24 4 32 0 Q40 -4 48 0 Q56 4 64 0 Q72 -4 80 0 Q88 4 96 0 Q104 -4 112 0 Q120 4 128 0 Q136 -4 144 0 Q152 4 160 0 Q168 -4 176 0 Q184 4 192 0 Q200 -4 208 0 Q216 4 224 0 Q232 -4 240 0 Q248 4 256 0 Q264 -4 272 0 Q280 4 288 0 Q296 -4 304 0 Q312 4 320 0 Q328 -4 336 0 Q344 4 352 0 Q360 -4 368 0 Q376 4 384 0 Q392 -4 400 0" fill="none" stroke="#9b88cc" stroke-width="1" opacity=".4"/>
+        </g>
+        <text x="410" y="18" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">= CHORD</text>
+      </g>
+      
+      <defs><marker id="arrowAmber" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--amber)"/></marker></defs>
+    </svg>
+  </div>
+  
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="label">Info Density</div>
+      <div class="stat-value">6×</div>
+      <div class="stat-compare">vs. human speech</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Pitch</div>
+      <div class="stat-value">Perfect</div>
+      <div class="stat-compare">C♯ ≠ C♭, like red ≠ yellow</div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERNAL ARCHITECTURE -->
+<section id="sec-internal" class="reveal">
+  <span class="section-num">05</span>
+  <h2>Internal Architecture</h2>
+  <div class="divider"></div>
+  
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="tab-body">Body</button>
+    <button class="tab-btn" data-tab="tab-circ">Circulatory</button>
+    <button class="tab-btn" data-tab="tab-muscle">Muscles</button>
+    <button class="tab-btn" data-tab="tab-brain">Brain</button>
+    <button class="tab-btn" data-tab="tab-exo">Exoskeleton</button>
+  </div>
+  
+  <!-- TAB: Body -->
+  <div class="tab-content active" id="tab-body">
+    <p>An Eridian's body is <strong>mostly inorganic</strong>. Less than 1 kg of its ~167 kg mass is living tissue. Think of it as a <em>walking vehicle</em> crewed by microscopic worker cells — like bees that built a mobile hive, then evolved a brain to steer it.</p>
+    
+    <div class="compare-bar-wrap">
+      <div class="compare-row">
+        <span class="compare-label">Human</span>
+        <div class="compare-track">
+          <div class="compare-fill earth" data-width="95" style="width:0%">95% living cells</div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label">Eridian</span>
+        <div class="compare-track">
+          <div class="compare-fill erid" data-width="0.6" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <p class="dim" style="font-size:.8rem;text-align:center">Percentage of body mass that is living tissue. Eridian: <0.6%</p>
+    
+    <div class="info-card">
+      <p style="margin:0;font-size:.85rem"><strong>Blood:</strong> Liquid mercury carrying dissolved metals (zinc, potassium, sodium, aluminum, tin, copper, and trace silver &amp; gold). Worker cells ride this metallic river to reach job sites throughout the body.</p>
+    </div>
+  </div>
+  
+  <!-- TAB: Circulatory -->
+  <div class="tab-content" id="tab-circ">
+    <p>Two completely separate bloodstreams, kept at different temperatures. This thermal gradient is the engine that powers everything.</p>
+    
+    <div class="diagram-container">
+      <svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
+        <rect width="500" height="380" fill="var(--bg2)" rx="12"/>
+        
+        <!-- ACS Side -->
+        <g transform="translate(30,40)">
+          <text x="100" y="0" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--teal)" letter-spacing=".1em">ACS</text>
+          <text x="100" y="14" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">AMBIENT CIRCULATORY</text>
+          
+          <!-- Temperature badge -->
+          <rect x="55" y="24" width="90" height="24" rx="12" fill="rgba(78,205,196,.1)" stroke="var(--teal)" stroke-width="1"/>
+          <text x="100" y="40" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="var(--teal)">210°C</text>
+          
+          <!-- Vessel representation -->
+          <rect x="20" y="65" width="160" height="100" rx="8" fill="rgba(78,205,196,.04)" stroke="var(--teal)" stroke-width="1" stroke-dasharray="4,4"/>
+          
+          <!-- Description -->
+          <text x="100" y="85" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Ambient temperature</text>
+          <text x="100" y="98" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Worker cells present</text>
+          <text x="100" y="111" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Na₂O·SiO₂ vessels</text>
+          <text x="100" y="124" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Heat radiators on carapace</text>
+          <text x="100" y="137" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Cools muscles after use</text>
+          
+          <!-- Worker cell dots -->
+          <circle cx="45" cy="90" r="3" fill="var(--teal)" opacity=".5"><animate attributeName="cy" values="90;120;90" dur="4s" repeatCount="indefinite"/></circle>
+          <circle cx="80" cy="110" r="2" fill="var(--teal)" opacity=".4"><animate attributeName="cy" values="110;85;110" dur="3.5s" repeatCount="indefinite"/></circle>
+          <circle cx="150" cy="100" r="2.5" fill="var(--teal)" opacity=".4"><animate attributeName="cy" values="100;130;100" dur="5s" repeatCount="indefinite"/></circle>
+        </g>
+        
+        <!-- HCS Side -->
+        <g transform="translate(270,40)">
+          <text x="100" y="0" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--hcs)" letter-spacing=".1em">HCS</text>
+          <text x="100" y="14" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">HOT CIRCULATORY</text>
+          
+          <rect x="55" y="24" width="90" height="24" rx="12" fill="rgba(232,93,58,.1)" stroke="var(--hcs)" stroke-width="1"/>
+          <text x="100" y="40" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="var(--hcs)">305°C</text>
+          
+          <rect x="20" y="65" width="160" height="100" rx="8" fill="rgba(232,93,58,.04)" stroke="var(--hcs)" stroke-width="1" stroke-dasharray="4,4"/>
+          
+          <text x="100" y="85" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Above water's boiling point</text>
+          <text x="100" y="98" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">NO worker cells (fatal)</text>
+          <text x="100" y="111" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Insulated vessels</text>
+          <text x="100" y="124" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Powers muscle contraction</text>
+          <text x="100" y="137" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Sterilizes food</text>
+          
+          <!-- Hot particles -->
+          <circle cx="50" cy="95" r="2" fill="var(--hcs)" opacity=".4"><animate attributeName="opacity" values=".2;.6;.2" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="140" cy="105" r="2.5" fill="var(--hcs)" opacity=".3"><animate attributeName="opacity" values=".3;.7;.3" dur="2.5s" repeatCount="indefinite"/></circle>
+        </g>
+        
+        <!-- Hearts -->
+        <g transform="translate(0,220)">
+          <text x="250" y="0" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--text-faint)" letter-spacing=".1em">5 HEARTS — ONE PER LEG</text>
+          <g transform="translate(80,20)">
+            <g>
+              <path d="M0 12 L8 0 L16 12 L8 20 Z" fill="rgba(232,93,58,.2)" stroke="var(--hcs)" stroke-width="1">
+                <animate attributeName="d" values="M0 12 L8 0 L16 12 L8 20 Z;M0 12 L8 2 L16 12 L8 18 Z;M0 12 L8 0 L16 12 L8 20 Z" dur="1s" repeatCount="indefinite"/>
+              </path>
+            </g>
+          </g>
+          <g transform="translate(160,20)">
+            <path d="M0 12 L8 0 L16 12 L8 20 Z" fill="rgba(232,93,58,.2)" stroke="var(--hcs)" stroke-width="1">
+              <animate attributeName="d" values="M0 12 L8 0 L16 12 L8 20 Z;M0 12 L8 2 L16 12 L8 18 Z;M0 12 L8 0 L16 12 L8 20 Z" dur="1.1s" repeatCount="indefinite"/>
+            </path>
+          </g>
+          <g transform="translate(240,20)">
+            <path d="M0 12 L8 0 L16 12 L8 20 Z" fill="rgba(232,93,58,.2)" stroke="var(--hcs)" stroke-width="1">
+              <animate attributeName="d" values="M0 12 L8 0 L16 12 L8 20 Z;M0 12 L8 2 L16 12 L8 18 Z;M0 12 L8 0 L16 12 L8 20 Z" dur="0.9s" repeatCount="indefinite"/>
+            </path>
+          </g>
+          <g transform="translate(320,20)">
+            <path d="M0 12 L8 0 L16 12 L8 20 Z" fill="rgba(232,93,58,.2)" stroke="var(--hcs)" stroke-width="1">
+              <animate attributeName="d" values="M0 12 L8 0 L16 12 L8 20 Z;M0 12 L8 2 L16 12 L8 18 Z;M0 12 L8 0 L16 12 L8 20 Z" dur="1.05s" repeatCount="indefinite"/>
+            </path>
+          </g>
+          <g transform="translate(400,20)">
+            <path d="M0 12 L8 0 L16 12 L8 20 Z" fill="rgba(232,93,58,.2)" stroke="var(--hcs)" stroke-width="1">
+              <animate attributeName="d" values="M0 12 L8 0 L16 12 L8 20 Z;M0 12 L8 2 L16 12 L8 18 Z;M0 12 L8 0 L16 12 L8 20 Z" dur="1.15s" repeatCount="indefinite"/>
+            </path>
+          </g>
+          <text x="250" y="60" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-dim)">Pumping 85 kg of mercury against 2.09g gravity</text>
+          
+          <!-- Electrical note -->
+          <g transform="translate(50,80)">
+            <rect x="0" y="0" width="400" height="40" rx="6" fill="rgba(240,192,64,.04)" stroke="var(--amber)" stroke-width=".5"/>
+            <text x="200" y="16" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--amber)" opacity=".8">⚡ ELECTRICAL SYSTEM</text>
+            <text x="200" y="30" text-anchor="middle" font-family="var(--sans)" font-size="7" fill="var(--text-dim)">Hearts alternate magnetic material to generate micro-voltage for piezoelectric micromuscles</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+  
+  <!-- TAB: Muscles -->
+  <div class="tab-content" id="tab-muscle">
+    <p>Eridian muscles are <strong class="hot">steam-powered</strong>. Tens of thousands of water-filled vesicles expand when heated by HCS blood, creating piston-like force. When HCS flow stops and ACS cools them back down, the steam condenses and the muscle relaxes.</p>
+    
+    <div class="muscle-demo">
+      <svg id="muscleSvg" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="200" fill="var(--bg)" rx="12"/>
+        
+        <!-- Muscle body -->
+        <rect id="muscleBody" x="80" y="60" width="240" height="80" rx="12" fill="rgba(196,132,92,.1)" stroke="var(--copper)" stroke-width="1.5" style="transition:all .6s"/>
+        
+        <!-- Vesicles -->
+        <g id="vesicles">
+          <circle cx="120" cy="100" r="8" fill="rgba(78,205,196,.15)" stroke="var(--teal)" stroke-width="1" class="vesicle"/>
+          <circle cx="160" cy="90" r="7" fill="rgba(78,205,196,.15)" stroke="var(--teal)" stroke-width="1" class="vesicle"/>
+          <circle cx="200" cy="105" r="9" fill="rgba(78,205,196,.15)" stroke="var(--teal)" stroke-width="1" class="vesicle"/>
+          <circle cx="240" cy="95" r="7" fill="rgba(78,205,196,.15)" stroke="var(--teal)" stroke-width="1" class="vesicle"/>
+          <circle cx="280" cy="100" r="8" fill="rgba(78,205,196,.15)" stroke="var(--teal)" stroke-width="1" class="vesicle"/>
+        </g>
+        
+        <!-- Labels -->
+        <text x="200" y="30" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--text-faint)" letter-spacing=".1em">SKELETAL MUSCLE — STEAM EXPANSION</text>
+        <text id="muscleState" x="200" y="175" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--teal)">RELAXED — 210°C (ACS)</text>
+        
+        <!-- HCS/ACS flow indicators -->
+        <g id="hcsFlow" opacity="0" style="transition:opacity .4s">
+          <line x1="60" y1="100" x2="80" y2="100" stroke="var(--hcs)" stroke-width="3"/>
+          <text x="40" y="103" text-anchor="end" font-family="var(--mono)" font-size="7" fill="var(--hcs)">HCS</text>
+        </g>
+      </svg>
+      
+      <button class="muscle-btn" id="muscleToggle" onclick="toggleMuscle()">CONTRACT (ADD HEAT)</button>
+    </div>
+    
+    <div class="info-card hot">
+      <h3 style="margin-top:0;color:var(--hcs)">Why Water?</h3>
+      <p style="margin:0;font-size:.85rem">Two reasons: (1) The HCS already runs above water's boiling point for pathogen defense — the thermal gradient was free. (2) Water is an excellent heat battery with high specific heat capacity, buffering overall temperature management.</p>
+    </div>
+    
+    <h3>Micromuscles</h3>
+    <p>Tiny piezoelectric crystal actuators inside blood vessels control valves and flaps. They're powered by the voltage potential the hearts create between the mercury bloodstream and the body chassis. No worker cells needed — critical because cells can't survive in the HCS.</p>
+  </div>
+  
+  <!-- TAB: Brain -->
+  <div class="tab-content" id="tab-brain">
+    <p>The brain is a <strong class="highlight">crystalline structure</strong> where impulses travel as light. Different zones of refractive material act like neurons — reinforcing, canceling, and directing photons. Fiber-optic crystal tendrils extend throughout the body as nerves.</p>
+    
+    <div class="diagram-container">
+      <svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg">
+        <rect width="500" height="260" fill="var(--bg2)" rx="12"/>
+        <text x="250" y="20" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--text-faint)" letter-spacing=".1em">CRYSTALLINE BRAIN — LIGHT-BASED NEURAL NETWORK</text>
+        
+        <!-- Brain crystal structure -->
+        <g transform="translate(150,40)">
+          <!-- Crystal facets -->
+          <polygon points="100,20 140,50 140,110 100,140 60,110 60,50" fill="rgba(240,192,64,.05)" stroke="var(--amber)" stroke-width="1"/>
+          <polygon points="100,40 130,60 130,100 100,120 70,100 70,60" fill="rgba(240,192,64,.08)" stroke="var(--amber)" stroke-width=".5"/>
+          
+          <!-- Light paths inside -->
+          <g opacity=".6">
+            <line x1="80" y1="60" x2="120" y2="80" stroke="var(--amber)" stroke-width="1">
+              <animate attributeName="opacity" values=".3;1;.3" dur="1.5s" repeatCount="indefinite"/>
+            </line>
+            <line x1="120" y1="80" x2="90" y2="110" stroke="var(--amber)" stroke-width="1">
+              <animate attributeName="opacity" values=".3;1;.3" dur="1.5s" begin=".3s" repeatCount="indefinite"/>
+            </line>
+            <line x1="90" y1="110" x2="110" y2="95" stroke="var(--amber)" stroke-width="1">
+              <animate attributeName="opacity" values=".3;1;.3" dur="1.5s" begin=".6s" repeatCount="indefinite"/>
+            </line>
+            <circle cx="100" cy="80" r="3" fill="var(--amber)" opacity=".4">
+              <animate attributeName="opacity" values=".2;.8;.2" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+          
+          <!-- Fiber-optic nerve tendrils -->
+          <path d="M60 80 L20 60 L-20 40" fill="none" stroke="var(--amber)" stroke-width="1" opacity=".3" stroke-dasharray="3,3"/>
+          <path d="M60 110 L10 130 L-30 160" fill="none" stroke="var(--amber)" stroke-width="1" opacity=".3" stroke-dasharray="3,3"/>
+          <path d="M140 80 L180 55 L220 35" fill="none" stroke="var(--amber)" stroke-width="1" opacity=".3" stroke-dasharray="3,3"/>
+          <path d="M140 110 L190 135 L230 165" fill="none" stroke="var(--amber)" stroke-width="1" opacity=".3" stroke-dasharray="3,3"/>
+          <path d="M100 140 L100 180" fill="none" stroke="var(--amber)" stroke-width="1" opacity=".3" stroke-dasharray="3,3"/>
+        </g>
+        
+        <!-- Labels -->
+        <g font-family="var(--mono)" font-size="7" fill="var(--text-dim)">
+          <text x="90" y="75">← TO LIMB 1</text>
+          <text x="70" y="195">← TO LIMB 2</text>
+          <text x="380" y="70">TO LIMB 3 →</text>
+          <text x="390" y="200">TO LIMB 4 →</text>
+          <text x="250" y="235" text-anchor="middle">TO LIMB 5 ↓</text>
+        </g>
+        
+        <text x="250" y="250" text-anchor="middle" font-family="var(--sans)" font-size="8" fill="var(--text-faint)">Located inside the Colony — requires constant worker cell maintenance</text>
+      </svg>
+    </div>
+    
+    <h3>Cognitive Profile</h3>
+    <div class="compare-bar-wrap">
+      <p class="label" style="margin-bottom:12px">ERIDIAN vs HUMAN STRENGTHS</p>
+      <div class="compare-row"><span class="compare-label" style="width:110px">Multitasking</span><div class="compare-track"><div class="compare-fill erid" data-width="90" style="width:0">Eridian ★</div></div></div>
+      <div class="compare-row"><span class="compare-label" style="width:110px">Memorization</span><div class="compare-track"><div class="compare-fill erid" data-width="85" style="width:0">Eridian ★</div></div></div>
+      <div class="compare-row"><span class="compare-label" style="width:110px">Focus</span><div class="compare-track"><div class="compare-fill earth" data-width="80" style="width:0">Human ★</div></div></div>
+      <div class="compare-row"><span class="compare-label" style="width:110px">Spatial Memory</span><div class="compare-track"><div class="compare-fill earth" data-width="85" style="width:0">Human ★</div></div></div>
+      <div class="compare-row"><span class="compare-label" style="width:110px">Coordination</span><div class="compare-track"><div class="compare-fill earth" data-width="75" style="width:0">Human ★</div></div></div>
+    </div>
+  </div>
+  
+  <!-- TAB: Exoskeleton -->
+  <div class="tab-content" id="tab-exo">
+    <p>A layered mineral shell protects the body, built and maintained by worker cells. It sheds and regrows as the Eridian grows.</p>
+    
+    <div class="diagram-container">
+      <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+        <rect width="500" height="280" fill="var(--bg2)" rx="12"/>
+        <text x="250" y="20" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--text-faint)" letter-spacing=".15em">EXOSKELETAL CROSS-SECTION</text>
+        
+        <!-- Layers stacked -->
+        <g transform="translate(50,40)">
+          <!-- Layer 1: Hematite crust -->
+          <rect x="0" y="0" width="300" height="45" rx="4" fill="rgba(138,96,69,.3)" stroke="#8a6045" stroke-width="1.5"/>
+          <text x="310" y="15" font-family="var(--mono)" font-size="8" fill="var(--copper-light)">HEMATITE CRUST</text>
+          <text x="310" y="28" font-family="var(--sans)" font-size="7" fill="var(--text-dim)">Fe₂O₃ — Outer armor</text>
+          <text x="310" y="40" font-family="var(--sans)" font-size="7" fill="var(--text-dim)">ρ = 5260 kg/m³</text>
+          <!-- Texture -->
+          <g opacity=".3"><line x1="20" y1="10" x2="60" y2="12" stroke="#6a4535"/><line x1="80" y1="8" x2="140" y2="15" stroke="#6a4535"/><line x1="160" y1="5" x2="220" y2="10" stroke="#6a4535"/><line x1="40" y1="25" x2="100" y2="30" stroke="#6a4535"/><line x1="130" y1="28" x2="200" y2="35" stroke="#6a4535"/></g>
+          
+          <!-- Layer 2: Accretion layer -->
+          <rect x="0" y="50" width="300" height="40" rx="4" fill="rgba(120,90,60,.25)" stroke="#7a5a3c" stroke-width="1"/>
+          <text x="310" y="65" font-family="var(--mono)" font-size="8" fill="var(--copper)">ACCRETION LAYER</text>
+          <text x="310" y="78" font-family="var(--sans)" font-size="7" fill="var(--text-dim)">Growth zone — new material added</text>
+          
+          <!-- Layer 3: Perfusion mesh -->
+          <rect x="0" y="95" width="300" height="40" rx="4" fill="rgba(78,205,196,.06)" stroke="var(--teal-dim)" stroke-width="1"/>
+          <text x="310" y="110" font-family="var(--mono)" font-size="8" fill="var(--teal)">PERFUSION MESH</text>
+          <text x="310" y="123" font-family="var(--sans)" font-size="7" fill="var(--text-dim)">Blood capillary network</text>
+          <!-- Capillary lines -->
+          <g opacity=".3"><path d="M20 110 Q50 105 80 110 Q110 115 140 110 Q170 105 200 110 Q230 115 260 110" fill="none" stroke="var(--teal)" stroke-width="1"/><path d="M30 120 Q60 125 90 120 Q120 115 150 120 Q180 125 210 120 Q240 115 270 120" fill="none" stroke="var(--teal)" stroke-width=".7"/></g>
+          
+          <!-- Layer 4: Trabecular matrix -->
+          <rect x="0" y="140" width="300" height="50" rx="4" fill="rgba(196,132,92,.08)" stroke="var(--copper-dim)" stroke-width="1"/>
+          <text x="310" y="155" font-family="var(--mono)" font-size="8" fill="var(--copper-dim)">TRABECULAR MATRIX</text>
+          <text x="310" y="168" font-family="var(--sans)" font-size="7" fill="var(--text-dim)">Honeycomb support structure</text>
+          <text x="310" y="180" font-family="var(--sans)" font-size="7" fill="var(--text-dim)">Worker cell access channels</text>
+          <!-- Honeycomb pattern -->
+          <g opacity=".2" stroke="var(--copper)" fill="none">
+            <path d="M30 155 L40 150 L50 155 L50 165 L40 170 L30 165 Z"/>
+            <path d="M50 155 L60 150 L70 155 L70 165 L60 170 L50 165 Z"/>
+            <path d="M70 155 L80 150 L90 155 L90 165 L80 170 L70 165 Z"/>
+            <path d="M90 155 L100 150 L110 155 L110 165 L100 170 L90 165 Z"/>
+            <path d="M40 165 L50 160 L60 165 L60 175 L50 180 L40 175 Z"/>
+            <path d="M60 165 L70 160 L80 165 L80 175 L70 180 L60 175 Z"/>
+            <path d="M80 165 L90 160 L100 165 L100 175 L90 180 L80 175 Z"/>
+          </g>
+        </g>
+        
+        <!-- Internal skeleton note -->
+        <g transform="translate(50,245)">
+          <text x="0" y="0" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">BENEATH: Internal metallic skeleton (iron) — literally metal bones with hinge joints</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- THE COLONY -->
+<section id="sec-colony" class="reveal">
+  <span class="section-num">06</span>
+  <h2>The Colony</h2>
+  <div class="divider"></div>
+  
+  <p>The most critical organ. A sealed chamber deep in the thorax that houses the brain and serves as the breeding ground for all worker cells. Think of it as the bridge and crew quarters of the biological ship.</p>
+  
+  <div class="cell-container" id="cellContainer">
+    <!-- Worker cells will be animated via JS -->
+    <div style="position:absolute;bottom:12px;left:12px;font-family:var(--mono);font-size:.6rem;color:var(--text-faint)">COLONY — WORKER CELL ACTIVITY</div>
+  </div>
+  
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="label">Colony Workers</div>
+      <div class="stat-value">72%</div>
+      <div class="stat-compare">Self-balancing biosphere</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Brain Service</div>
+      <div class="stat-value">20%</div>
+      <div class="stat-compare">Constant crystal maintenance</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Body Workers</div>
+      <div class="stat-value">8%</div>
+      <div class="stat-compare">Travel via bloodstream</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Cell Types</div>
+      <div class="stat-value">1000s</div>
+      <div class="stat-compare">Each with unique DNA</div>
+    </div>
+  </div>
+  
+  <div class="info-card teal">
+    <p style="margin:0;font-size:.85rem"><strong>Unlike human cells</strong>, there's no single DNA blueprint. Each worker cell type has its own genetics — bone-layers deposit metal atoms, nerve-builders grow silicon crystals, transporters carry energy molecules. They reproduce via mitosis independently. Tungsten in their cell walls makes them neutrally buoyant in mercury.</p>
+  </div>
+</section>
+
+<!-- METABOLISM -->
+<section id="sec-metabolism" class="reveal">
+  <span class="section-num">07</span>
+  <h2>Metabolism</h2>
+  <div class="divider"></div>
+  
+  <h3>Eating — A Weekly Ritual</h3>
+  
+  <div class="timeline">
+    <div class="timeline-item reveal">
+      <strong class="accent">Hunt & Butcher</strong>
+      <p class="dim" style="font-size:.85rem">Eridians are apex predators that kill prey and store it communally. They use their claws to grind and separate useful parts — this is pleasurable, like chewing is for us.</p>
+    </div>
+    <div class="timeline-item reveal">
+      <strong class="accent">Crack & Eject</strong>
+      <p class="dim" style="font-size:.85rem">Once per week, the ventral carapace cracks along a pre-weakened fissure. Old waste is ejected. New food is loaded in. The opening seals and heals within hours.</p>
+    </div>
+    <div class="timeline-item reveal">
+      <strong class="accent">Sterilize</strong>
+      <p class="dim" style="font-size:.85rem">Food is heated to HCS temperature (305°C) for several days. This kills all organic pathogens — water-based life can't survive above 230°C at 28 atm.</p>
+    </div>
+    <div class="timeline-item reveal">
+      <strong class="accent">Digest</strong>
+      <p class="dim" style="font-size:.85rem">Specialized worker cells pick through the sterilized material, extracting needed compounds and elements. No intestinal tract — just cellular scavenging.</p>
+    </div>
+    <div class="timeline-item reveal">
+      <strong class="accent">Food Coma</strong>
+      <p class="dim" style="font-size:.85rem">Dormancy follows eating. The HCS cooldown is most efficient during dormancy, and it conserves energy for digestion.</p>
+    </div>
+  </div>
+  
+  <h3>Dormancy</h3>
+  <p>Far deeper than human sleep — more like general anesthesia. The Eridian is <strong>completely paralyzed</strong>. The HCS cools to ACS temperature, allowing worker cells to enter and repair the hot system. Hearts stop. Blood flow ceases. This is the only time HCS maintenance can happen.</p>
+  
+  <div class="info-card amber">
+    <p style="margin:0;font-size:.85rem"><strong>Sick? Get moving.</strong> Unlike humans who heal better with rest, a sick Eridian heals faster with exercise — worker cells need flowing blood to reach injury sites. But HCS injuries can only heal during dormancy. Severe HCS damage triggers sudden dormancy — the Eridian equivalent of going into shock.</p>
+  </div>
+  
+  <h3>Energy Budget</h3>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="label">Power Draw</div>
+      <div class="stat-value">286 W</div>
+      <div class="stat-compare">Human: 96 W</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Meal Cycle</div>
+      <div class="stat-value">~4 days</div>
+      <div class="stat-compare">32× human meal energy</div>
+    </div>
+  </div>
+</section>
+
+<!-- HEAT REJECTION -->
+<section id="sec-heat" class="reveal">
+  <span class="section-num">08</span>
+  <h2>Heat Rejection</h2>
+  <div class="divider"></div>
+  
+  <p>The most critical ongoing process. An Eridian must radiate 286 W of waste heat continuously. The cooling lattice under the cap segment pulls ammonia air across a sponge-like capillary structure — rigid sodium silicate tubes carrying ACS blood.</p>
+  
+  <div class="diagram-container">
+    <svg viewBox="0 0 500 250" xmlns="http://www.w3.org/2000/svg">
+      <rect width="500" height="250" fill="var(--bg2)" rx="12"/>
+      <text x="250" y="20" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--text-faint)" letter-spacing=".15em">HEAT REJECTION — "BREATHING" CYCLE</text>
+      
+      <!-- Cap segment cross-section -->
+      <g transform="translate(50,40)">
+        <!-- Outer cap -->
+        <path d="M0 120 Q200 20 400 120" fill="none" stroke="var(--copper)" stroke-width="2"/>
+        
+        <!-- Capillary lattice zone -->
+        <rect x="60" y="65" width="280" height="45" rx="4" fill="rgba(232,93,58,.05)" stroke="var(--hcs)" stroke-width=".5" stroke-dasharray="3,3"/>
+        
+        <!-- Capillary lines -->
+        <g opacity=".4">
+          <line x1="80" y1="70" x2="80" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="105" y1="68" x2="105" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="130" y1="67" x2="130" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="155" y1="65" x2="155" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="180" y1="65" x2="180" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="205" y1="65" x2="205" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="230" y1="65" x2="230" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="255" y1="67" x2="255" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="280" y1="68" x2="280" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="305" y1="70" x2="305" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+          <line x1="320" y1="72" x2="320" y2="105" stroke="var(--hcs)" stroke-width="2"/>
+        </g>
+        
+        <!-- Cool air in (sides) -->
+        <g fill="var(--teal)" opacity=".6">
+          <path d="M25 95 L55 85" stroke="var(--teal)" stroke-width="1.5" fill="none" marker-end="url(#arrowTeal)"/>
+          <path d="M375 95 L345 85" stroke="var(--teal)" stroke-width="1.5" fill="none" marker-end="url(#arrowTeal)"/>
+          <text x="10" y="110" font-family="var(--mono)" font-size="7" fill="var(--teal)">COOL NH₃ IN</text>
+          <text x="350" y="110" font-family="var(--mono)" font-size="7" fill="var(--teal)">COOL NH₃ IN</text>
+        </g>
+        
+        <!-- Hot air out (top) -->
+        <g opacity=".5">
+          <path d="M180 55 L180 30" stroke="var(--hcs)" stroke-width="1.5" fill="none" marker-end="url(#arrowHcs)"/>
+          <path d="M200 52 L200 25" stroke="var(--hcs)" stroke-width="1.5" fill="none" marker-end="url(#arrowHcs)"/>
+          <path d="M220 55 L220 30" stroke="var(--hcs)" stroke-width="1.5" fill="none" marker-end="url(#arrowHcs)"/>
+          <text x="200" y="20" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--hcs)">HOT AIR OUT ↑</text>
+        </g>
+        
+        <!-- Diaphragm -->
+        <path d="M60 115 Q200 130 340 115" fill="none" stroke="var(--amber)" stroke-width="2"/>
+        <text x="360" y="125" font-family="var(--mono)" font-size="7" fill="var(--amber)">DIAPHRAGM</text>
+        
+        <!-- Labels -->
+        <text x="200" y="85" text-anchor="middle" font-family="var(--mono)" font-size="7" fill="var(--text-faint)">CAPILLARY LATTICE</text>
+      </svg>
+      <defs>
+        <marker id="arrowTeal" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--teal)"/></marker>
+        <marker id="arrowHcs" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--hcs)"/></marker>
+      </defs>
+    </svg>
+  </div>
+  
+  <h3 style="color:var(--hcs)">The 31-Minute Death Clock</h3>
+  <p>If breathing stops, heat builds up in the mercury bloodstream. The cascade is brutal:</p>
+  
+  <div class="death-clock">
+    <div class="label">ASPHYXIATION TIMELINE</div>
+    <div class="clock-display" id="clockDisplay">31:00</div>
+    <div class="clock-bar"><div class="clock-fill" id="clockFill" style="width:100%"></div></div>
+    <div id="clockStatus" style="font-family:var(--mono);font-size:.75rem;color:var(--text-dim);margin:8px 0">Tap to simulate</div>
+    <button class="clock-btn" id="clockBtn" onclick="startDeathClock()">START SIMULATION</button>
+    
+    <div style="text-align:left;margin-top:20px">
+      <div class="timeline" style="padding-left:16px">
+        <div class="timeline-item" style="margin-bottom:12px">
+          <span style="font-family:var(--mono);font-size:.75rem;color:var(--teal)">0:00 — 214°C</span>
+          <p class="dim" style="font-size:.8rem;margin:0">Worker cells retreat to colony. Sluggishness, aching.</p>
+        </div>
+        <div class="timeline-item" style="margin-bottom:12px">
+          <span style="font-family:var(--mono);font-size:.75rem;color:var(--amber)">~3 min — 216°C</span>
+          <p class="dim" style="font-size:.8rem;margin:0">Colony seals. Endothermic reserves activated. Body failing.</p>
+        </div>
+        <div class="timeline-item" style="margin-bottom:12px">
+          <span style="font-family:var(--mono);font-size:.75rem;color:var(--hcs)">11 min — 223°C</span>
+          <p class="dim" style="font-size:.8rem;margin:0">Babbitt alloy insulation begins melting. Last defense.</p>
+        </div>
+        <div class="timeline-item" style="margin-bottom:12px">
+          <span style="font-family:var(--mono);font-size:.75rem;color:#ff3333">26 min — Insulation gone</span>
+          <p class="dim" style="font-size:.8rem;margin:0">Colony exposed. 5 more minutes to full breach.</p>
+        </div>
+        <div class="timeline-item" style="margin-bottom:0">
+          <span style="font-family:var(--mono);font-size:.75rem;color:#ff0000">31 min — Colony at 223°C</span>
+          <p class="dim" style="font-size:.8rem;margin:0">Worker cells die. <strong>Death.</strong> No recovery.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIZE & DIMENSIONS -->
+<section id="sec-size" class="reveal">
+  <span class="section-num">09</span>
+  <h2>Dimensions</h2>
+  <div class="divider"></div>
+  
+  <div class="size-compare">
+    <!-- Human figure -->
+    <div class="size-figure">
+      <svg viewBox="0 0 60 180" width="60" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="15" r="10" fill="none" stroke="#5b9bd5" stroke-width="1.5"/>
+        <line x1="30" y1="25" x2="30" y2="100" stroke="#5b9bd5" stroke-width="1.5"/>
+        <line x1="30" y1="50" x2="10" y2="80" stroke="#5b9bd5" stroke-width="1.5"/>
+        <line x1="30" y1="50" x2="50" y2="80" stroke="#5b9bd5" stroke-width="1.5"/>
+        <line x1="30" y1="100" x2="15" y2="170" stroke="#5b9bd5" stroke-width="1.5"/>
+        <line x1="30" y1="100" x2="45" y2="170" stroke="#5b9bd5" stroke-width="1.5"/>
+      </svg>
+      <div class="label">Human</div>
+      <div style="font-family:var(--mono);font-size:.75rem;color:#5b9bd5">~170 cm</div>
+      <div style="font-family:var(--mono);font-size:.65rem;color:var(--text-faint)">~80 kg</div>
+    </div>
+    
+    <!-- Eridian figure -->
+    <div class="size-figure">
+      <svg viewBox="0 0 120 180" width="120" xmlns="http://www.w3.org/2000/svg">
+        <!-- Scaled: 50cm = about 53px in this scale. Position at bottom -->
+        <g transform="translate(10,110)">
+          <!-- Body -->
+          <path d="M50 10 L80 25 L75 50 L50 58 L25 50 L20 25 Z" fill="none" stroke="var(--copper)" stroke-width="1.5"/>
+          <!-- Cap -->
+          <path d="M38 12 L50 5 L62 12" fill="none" stroke="var(--copper)" stroke-width="1"/>
+          <!-- Legs -->
+          <line x1="22" y1="30" x2="2" y2="65" stroke="var(--copper)" stroke-width="1.5"/>
+          <line x1="78" y1="30" x2="98" y2="65" stroke="var(--copper)" stroke-width="1.5"/>
+          <line x1="25" y1="48" x2="8" y2="68" stroke="var(--copper)" stroke-width="1.5"/>
+          <line x1="75" y1="48" x2="92" y2="68" stroke="var(--copper)" stroke-width="1.5"/>
+          <line x1="50" y1="58" x2="50" y2="70" stroke="var(--copper)" stroke-width="1.5"/>
+        </g>
+      </svg>
+      <div class="label">Eridian</div>
+      <div style="font-family:var(--mono);font-size:.75rem;color:var(--copper)">~50 cm</div>
+      <div style="font-family:var(--mono);font-size:.65rem;color:var(--text-faint)">~167 kg</div>
+    </div>
+  </div>
+  <p class="dim" style="text-align:center;font-size:.8rem">Small but incredibly dense. On their homeworld (2.09g), their effective weight is like 349 kg on Earth.</p>
+  
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="label">Thorax</div>
+      <div class="stat-value">60 cm</div>
+      <div class="stat-compare">Pentagonal, 20 cm tall</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Volume</div>
+      <div class="stat-value">63 L</div>
+      <div class="stat-compare">70% empty space</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Blood</div>
+      <div class="stat-value">85.6 kg</div>
+      <div class="stat-compare">Liquid mercury — 10% vol</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Reach</div>
+      <div class="stat-value">1.3 m</div>
+      <div class="stat-compare">Standing on 3 limbs</div>
+    </div>
+  </div>
+</section>
+
+<!-- REPRODUCTION -->
+<section id="sec-reproduction" class="reveal">
+  <span class="section-num">10</span>
+  <h2>Reproduction</h2>
+  <div class="divider"></div>
+  
+  <p>Eridians are <strong>hermaphrodites</strong>, like most life on Erid. Two parents lay eggs together and cover them for protection. Inside the eggs, worker cell subtypes from each parent <em>compete</em> — one line overwhelms the other, randomly, for each of thousands of cell types. The winners become the offspring's "genes."</p>
+  
+  <div class="info-card">
+    <p style="margin:0;font-size:.85rem">Typical litter size: <strong class="accent">5</strong>. Fives show up everywhere in Eridian biology — 5 legs, 5 hearts, 5 gas bladders, 5 vents in, 5 vents out. Both parents feel parental instinct toward the offspring.</p>
+  </div>
+</section>
+
+<!-- VULNERABILITIES -->
+<section id="sec-vulnerabilities" class="reveal">
+  <span class="section-num">11</span>
+  <h2>Vulnerabilities</h2>
+  <div class="divider"></div>
+  
+  <h3>Temperature Tolerance</h3>
+  <div class="diagram-container" style="padding:30px 20px">
+    <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="300" fill="var(--bg2)" rx="12"/>
+      
+      <!-- Temperature scale -->
+      <g transform="translate(60,20)">
+        <!-- Track -->
+        <rect x="0" y="0" width="30" height="260" rx="15" fill="var(--bg)" stroke="rgba(196,132,92,.15)" stroke-width="1"/>
+        
+        <!-- Gradient fill -->
+        <defs>
+          <linearGradient id="tempGrad" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="var(--teal)"/>
+            <stop offset="30%" stop-color="var(--teal)"/>
+            <stop offset="50%" stop-color="var(--amber)"/>
+            <stop offset="75%" stop-color="var(--hcs)"/>
+            <stop offset="100%" stop-color="#ff0000"/>
+          </linearGradient>
+        </defs>
+        <rect x="4" y="4" width="22" height="252" rx="11" fill="url(#tempGrad)" opacity=".3"/>
+        
+        <!-- Temperature markers -->
+        <!-- 280°C - instant death -->
+        <g transform="translate(40,10)">
+          <line x1="-10" y1="0" x2="0" y2="0" stroke="#ff0000" stroke-width="2"/>
+          <text x="5" y="3" font-family="var(--mono)" font-size="8" fill="#ff0000">280°C — INSTANTLY FATAL</text>
+        </g>
+        <!-- 240°C - fatal extended -->
+        <g transform="translate(40,58)">
+          <line x1="-10" y1="0" x2="0" y2="0" stroke="var(--hcs)" stroke-width="2"/>
+          <text x="5" y="3" font-family="var(--mono)" font-size="8" fill="var(--hcs)">240°C — Fatal (extended)</text>
+        </g>
+        <!-- 230°C - heat exhaustion -->
+        <g transform="translate(40,90)">
+          <line x1="-10" y1="0" x2="0" y2="0" stroke="var(--amber)" stroke-width="2"/>
+          <text x="5" y="3" font-family="var(--mono)" font-size="8" fill="var(--amber)">230°C — Heat exhaustion</text>
+        </g>
+        <!-- 223°C - colony insulation melts -->
+        <g transform="translate(40,108)">
+          <line x1="-10" y1="0" x2="0" y2="0" stroke="var(--hcs)" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="5" y="3" font-family="var(--mono)" font-size="7" fill="var(--text-dim)">223°C — Babbitt alloy melts</text>
+        </g>
+        <!-- 210°C - comfortable -->
+        <g transform="translate(40,140)">
+          <line x1="-10" y1="0" x2="0" y2="0" stroke="var(--teal)" stroke-width="2"/>
+          <text x="5" y="3" font-family="var(--mono)" font-size="8" fill="var(--teal)">210°C — Comfortable ✓</text>
+          <rect x="-2" y="-8" width="200" height="16" rx="3" fill="rgba(78,205,196,.05)" stroke="var(--teal)" stroke-width=".5"/>
+        </g>
+        <!-- 19 atm / fatal pressure -->
+        <g transform="translate(40,220)">
+          <line x1="-10" y1="0" x2="0" y2="0" stroke="var(--hcs)" stroke-width="1.5"/>
+          <text x="5" y="3" font-family="var(--mono)" font-size="8" fill="var(--hcs)">Below 19 atm — Fatal</text>
+          <text x="5" y="14" font-family="var(--sans)" font-size="7" fill="var(--text-faint)">(Water in worker cells boils)</text>
+        </g>
+      </g>
+    </svg>
+  </div>
+  
+  <h3>Radiation</h3>
+  <div class="info-card hot">
+    <p style="margin:0;font-size:.85rem">Eridians have <strong>zero radiation defense</strong>. Their planet's 25× magnetic field + thick atmosphere blocks it all, so they never evolved repair mechanisms. No DNA redundancy, no error correction, no telomeres. Their mercury blood actually becomes radioactive under exposure, making things worse. This killed the entire crew of their interstellar ship except Rocky, who was shielded by Astrophage stores.</p>
+  </div>
+</section>
+
+<!-- CULTURE -->
+<section id="sec-culture" class="reveal">
+  <span class="section-num">12</span>
+  <h2>Culture & Civilization</h2>
+  <div class="divider"></div>
+  
+  <div class="culture-grid">
+    <div class="culture-item">
+      <div style="font-family:var(--mono);font-size:1.2rem;color:var(--amber);margin-bottom:4px">Base 6</div>
+      <p class="dim" style="font-size:.82rem;margin:0">2 hands × 3 fingers = 6. Their math, timekeeping, and counting all use base-6. Their day divides into 10,000₆ units (7,776 in base-10).</p>
+    </div>
+    <div class="culture-item">
+      <div style="font-family:var(--mono);font-size:1.2rem;color:var(--teal);margin-bottom:4px">Texture</div>
+      <p class="dim" style="font-size:.82rem;margin:0">Writing is tactile — raised ink or punched holes. Computer monitors use pixels that rise and fall physically, creating readable texture via sound reflection.</p>
+    </div>
+    <div class="culture-item">
+      <div style="font-family:var(--mono);font-size:1.2rem;color:var(--copper-light);margin-bottom:4px">Soundproof</div>
+      <p class="dim" style="font-size:.82rem;margin:0">They can hear through walls like we see through glass. So their walls are extremely sound-insulated — the Eridian equivalent of curtains.</p>
+    </div>
+    <div class="culture-item">
+      <div style="font-family:var(--mono);font-size:1.2rem;color:var(--hcs);margin-bottom:4px">Sleep Watch</div>
+      <p class="dim" style="font-size:.82rem;margin:0">Helpless during dormancy, they evolved to guard each other in shifts. The instinct remains — like a human needing a blanket.</p>
+    </div>
+  </div>
+  
+  <div class="info-card">
+    <p style="margin:0;font-size:.85rem"><strong>Advanced in:</strong> Mathematics, materials science. <strong>Behind on:</strong> Computers, relativity. They didn't know about relativistic effects before launching their interstellar mission — they had far more fuel than needed, but the radiation exposure killed nearly everyone aboard.</p>
+  </div>
+</section>
+
+<!-- PANSPERMIA -->
+<section id="sec-origin" class="reveal">
+  <span class="section-num">13</span>
+  <h2>Shared Origin</h2>
+  <div class="divider"></div>
+  
+  <p>Eridians use <strong class="highlight">ATP and mitochondria</strong> — identical to Earth life. This is no coincidence. A panspermia event from the Tau Ceti system billions of years ago seeded life on both Earth and Erid. Two branches of the same tree, separated by 12 light-years and 210 degrees of temperature.</p>
+  
+  <div class="diagram-container" style="text-align:center;padding:30px">
+    <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="150" fill="var(--bg2)" rx="12"/>
+      
+      <!-- Tau Ceti -->
+      <circle cx="200" cy="30" r="12" fill="var(--amber)" opacity=".3"/>
+      <circle cx="200" cy="30" r="6" fill="var(--amber)" opacity=".6"/>
+      <text x="200" y="55" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--amber)">TAU CETI</text>
+      <text x="200" y="65" text-anchor="middle" font-family="var(--mono)" font-size="6" fill="var(--text-faint)">PANSPERMIA SOURCE</text>
+      
+      <!-- Branch to Earth -->
+      <path d="M185 40 Q100 70 80 120" fill="none" stroke="#5b9bd5" stroke-width="1" stroke-dasharray="4,4"/>
+      <circle cx="80" cy="125" r="8" fill="#5b9bd5" opacity=".3"/>
+      <circle cx="80" cy="125" r="4" fill="#5b9bd5" opacity=".5"/>
+      <text x="80" y="143" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="#5b9bd5">EARTH</text>
+      
+      <!-- Branch to Erid -->
+      <path d="M215 40 Q300 70 320 120" fill="none" stroke="var(--copper)" stroke-width="1" stroke-dasharray="4,4"/>
+      <circle cx="320" cy="125" r="8" fill="var(--copper)" opacity=".3"/>
+      <circle cx="320" cy="125" r="4" fill="var(--copper)" opacity=".5"/>
+      <text x="320" y="143" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--copper)">ERID</text>
+    </svg>
+  </div>
+</section>
+
+<footer>
+  <p style="font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--copper-dim);margin-bottom:8px">"Good, good, good!"</p>
+  <p>Based on Andy Weir's worldbuilding notes for <em>Project Hail Mary</em><br>
+  Anatomy references by @TopherStoll / Patreon.com/Deconstructions</p>
+</footer>
+
+<!-- Info Popup -->
+<div class="info-popup" id="infoPopup">
+  <div class="popup-handle"></div>
+  <button class="popup-close" onclick="closePopup()">✕</button>
+  <h4 id="popupTitle"></h4>
+  <p id="popupText"></p>
+</div>
+
+<script>
+// Anatomy popup data
+const anatomyInfo = {
+  limbs: {
+    title: "Pentadextrous Limbs",
+    text: "Five identical limbs with ball-and-socket shoulder joints and hinge elbows. Each ends in a trifurcated claw — closed to a weapon point, or opened flat as a foot. Any limb serves any purpose. On 5 legs they're sure-footed; on 3, fast; idle, they stand on 3 and use 2 as arms — swapping freely based on convenience or fatigue."
+  },
+  thorax: {
+    title: "Thorax & Carapace",
+    text: "A roughly pentagonal body about 60 cm across and 20 cm tall, covered in articulated exoskeleton made of oxidized minerals (primarily hematite). The shell is shed in pieces and regrown as needed. Inside: the colony, brain, 5 gas bladders, dual circulatory systems, and the steam-powered muscular system."
+  },
+  vents: {
+    title: "Heat Rejection Vents",
+    text: "Five intake vents around the perimeter of the cap segment pull cool ammonia air in. Five exhaust vents on top push heated air out. Between them: a rigid lattice of ACS blood capillaries, 3 cm tall, that radiates 286 W of waste heat. A diaphragm below pumps the air — this is how Eridians 'breathe.' The baffled design evolved for defense — damage to the capillaries causes major bleeding."
+  },
+  hearing: {
+    title: "Auricles (Hearing)",
+    text: "Hundreds of thousands of piezoelectric sensors covering the carapace, each tuned to a specific frequency. They generate tiny light pulses that feed the fiber-optic nervous system. From ambient noise alone, Eridians construct a full 3D model of their surroundings — omnidirectional, like human sight but in all directions at once. In silence, they tap the ground."
+  },
+  mouth: {
+    title: "Ventral Mouth",
+    text: "Facing downward, the mouth opens rarely — about once per week. The carapace cracks along a pre-weakened fissure to eject waste and receive new food, then seals shut and heals within hours. This approach evolved to defend against extremely aggressive pathogens in the Eridian biosphere."
+  }
+};
+
+// Popup handling
+const popup = document.getElementById('infoPopup');
+function closePopup() { popup.classList.remove('open'); }
+
+document.querySelectorAll('.hotspot').forEach(el => {
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const key = el.dataset.info;
+    if (anatomyInfo[key]) {
+      document.getElementById('popupTitle').textContent = anatomyInfo[key].title;
+      document.getElementById('popupText').textContent = anatomyInfo[key].text;
+      popup.classList.add('open');
+    }
+    document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('active'));
+    el.classList.add('active');
+  });
+});
+document.addEventListener('click', closePopup);
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    btn.closest('section').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.closest('section').querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(tab).classList.add('active');
+    // Trigger comparison bars in the newly visible tab
+    setTimeout(animateBars, 200);
+  });
+});
+
+// Muscle demo
+let muscleContracted = false;
+function toggleMuscle() {
+  const vesicles = document.querySelectorAll('.vesicle');
+  const body = document.getElementById('muscleBody');
+  const state = document.getElementById('muscleState');
+  const btn = document.getElementById('muscleToggle');
+  const hcs = document.getElementById('hcsFlow');
+  
+  muscleContracted = !muscleContracted;
+  if (muscleContracted) {
+    vesicles.forEach(v => {
+      const r = parseFloat(v.getAttribute('r'));
+      v.setAttribute('r', r * 1.8);
+      v.setAttribute('fill', 'rgba(232,93,58,.2)');
+      v.setAttribute('stroke', 'var(--hcs)');
+    });
+    body.setAttribute('width', '260');
+    body.setAttribute('x', '70');
+    state.textContent = 'CONTRACTED — 305°C (HCS) — STEAM EXPANSION';
+    state.setAttribute('fill', 'var(--hcs)');
+    btn.textContent = 'RELAX (COOL DOWN)';
+    btn.style.background = 'linear-gradient(135deg, var(--teal-dim), var(--teal))';
+    hcs.setAttribute('opacity', '1');
+  } else {
+    vesicles.forEach((v, i) => {
+      const sizes = [8, 7, 9, 7, 8];
+      v.setAttribute('r', sizes[i]);
+      v.setAttribute('fill', 'rgba(78,205,196,.15)');
+      v.setAttribute('stroke', 'var(--teal)');
+    });
+    body.setAttribute('width', '240');
+    body.setAttribute('x', '80');
+    state.textContent = 'RELAXED — 210°C (ACS)';
+    state.setAttribute('fill', 'var(--teal)');
+    btn.textContent = 'CONTRACT (ADD HEAT)';
+    btn.style.background = '';
+    hcs.setAttribute('opacity', '0');
+  }
+}
+
+// Death clock simulation
+let clockInterval = null;
+let clockTime = 1860; // 31 minutes in seconds
+function startDeathClock() {
+  const btn = document.getElementById('clockBtn');
+  if (clockInterval) {
+    clearInterval(clockInterval);
+    clockInterval = null;
+    clockTime = 1860;
+    updateClock();
+    btn.textContent = 'START SIMULATION';
+    return;
+  }
+  clockTime = 1860;
+  btn.textContent = 'RESET';
+  clockInterval = setInterval(() => {
+    clockTime -= 1;
+    if (clockTime <= 0) {
+      clockTime = 0;
+      clearInterval(clockInterval);
+      clockInterval = null;
+      btn.textContent = 'RESTART';
+    }
+    updateClock();
+  }, 50); // Speed up 20x for demo
+}
+
+function updateClock() {
+  const min = Math.floor(clockTime / 60);
+  const sec = clockTime % 60;
+  document.getElementById('clockDisplay').textContent = `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  document.getElementById('clockFill').style.width = (clockTime / 1860 * 100) + '%';
+  
+  const status = document.getElementById('clockStatus');
+  const display = document.getElementById('clockDisplay');
+  if (clockTime > 1680) { status.textContent = 'Normal — 210°C'; display.style.color = 'var(--teal)'; }
+  else if (clockTime > 1200) { status.textContent = 'Worker cells retreating — ~214°C'; display.style.color = 'var(--amber)'; }
+  else if (clockTime > 960) { status.textContent = 'Colony sealed — reserves burning — ~216°C'; display.style.color = 'var(--hcs)'; }
+  else if (clockTime > 300) { status.textContent = 'Babbitt alloy melting — 223°C'; display.style.color = '#ff5533'; }
+  else if (clockTime > 0) { status.textContent = 'Colony breached — cells dying'; display.style.color = '#ff0000'; }
+  else { status.textContent = 'DEAD'; display.style.color = '#ff0000'; }
+}
+
+// Scroll reveal
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// Comparison bar animation
+function animateBars() {
+  document.querySelectorAll('.compare-fill').forEach(bar => {
+    const rect = bar.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      bar.style.width = bar.dataset.width + '%';
+    }
+  });
+}
+window.addEventListener('scroll', animateBars);
+setTimeout(animateBars, 500);
+
+// Nav dots
+const sections = document.querySelectorAll('section[id]');
+const dotsContainer = document.getElementById('navDots');
+sections.forEach((sec, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'nav-dot';
+  dot.title = sec.id;
+  dot.addEventListener('click', () => sec.scrollIntoView({ behavior: 'smooth' }));
+  dotsContainer.appendChild(dot);
+});
+
+const dotObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = Array.from(sections).indexOf(e.target);
+      document.querySelectorAll('.nav-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => dotObserver.observe(s));
+
+// Worker cell animation in colony section
+const cellContainer = document.getElementById('cellContainer');
+for (let i = 0; i < 25; i++) {
+  const cell = document.createElement('div');
+  cell.className = 'worker-cell';
+  cell.style.left = Math.random() * 90 + '%';
+  cell.style.top = Math.random() * 80 + 10 + '%';
+  cell.style.animationDuration = (3 + Math.random() * 5) + 's';
+  cell.style.animationDelay = Math.random() * 3 + 's';
+  cell.style.width = (5 + Math.random() * 6) + 'px';
+  cell.style.height = cell.style.width;
+  const colors = ['var(--teal)', 'var(--amber)', 'var(--copper)'];
+  cell.style.background = colors[Math.floor(Math.random() * colors.length)];
+  cell.style.opacity = 0.2 + Math.random() * 0.4;
+  cellContainer.appendChild(cell);
+}
+</script>
+
+</body>
+</html>
